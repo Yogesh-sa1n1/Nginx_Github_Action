@@ -36,12 +36,12 @@ jobs:
 
       - name: Get Terraform Outputs
         id: tf
+        working-directory: terraformEC2
         run: |
           echo "ec2_ip=$(terraform output -raw ec2_public_ip)" >> $GITHUB_OUTPUT
           echo "ec2_key<<EOF" >> $GITHUB_OUTPUT
           terraform output -raw ec2_private_key >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-        working-directory: terraformEC2
 
   deploy:
     needs: terraform
@@ -70,7 +70,7 @@ jobs:
           username: ubuntu
           key: ${{ needs.terraform.outputs.ec2_key }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-website:latest
-            docker stop website || true
-            docker rm website || true
-            docker run -d --name website -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-website:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/my-website:latest
+            sudo docker stop website || true
+            sudo docker rm website || true
+            sudo docker run -d --name website -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-website:latest
