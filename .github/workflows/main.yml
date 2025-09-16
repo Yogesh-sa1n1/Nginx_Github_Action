@@ -86,5 +86,5 @@ jobs:
             sudo docker stop website || true
             sudo docker rm website || true
 
-            # Run new container
+            # Run new containerr
             sudo docker run -d --name website -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-website:latest
