@@ -3,9 +3,21 @@ provider "aws"{
 
 }
 
+# Environment variable (dev/prod/staging)
+variable "env" {
+  description = "Environment name"
+  type        = string
+  default     = "dev"
+}
+
+# Random suffix to avoid duplicate names
+resource "random_id" "suffix" {
+  byte_length = 2
+}
+
 resource "aws_security_group" "securityGroup"{
-    name= "Github Action"
-    description= "allow ssh access and tcp 8080"
+    name = "GithubAction-${var.env}-${random_id.suffix.hex}"
+    description = "allow ssh access and tcp 8080"
 
     ingress {
         from_port = 22
@@ -34,7 +46,7 @@ resource "tls_private_key" "KeyPair"{
 }
 
 resource "aws_key_pair" "generated_key" {
-  key_name   = "githubAction"
+  key_name   = "githubAction-${var.env}-${random_id.suffix.hex}"
   public_key = tls_private_key.KeyPair.public_key_openssh
 }
 
