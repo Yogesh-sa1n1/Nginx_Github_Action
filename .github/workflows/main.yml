@@ -70,6 +70,10 @@ jobs:
           username: ubuntu
           key: ${{ needs.terraform.outputs.ec2_key }}
           script: |
+            until command -v docker; do
+                echo "Waiting for Docker installation..."
+                sleep 30
+            done
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/my-website:latest
             sudo docker stop website || true
             sudo docker rm website || true
