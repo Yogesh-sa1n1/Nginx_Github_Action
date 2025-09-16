@@ -73,11 +73,18 @@ jobs:
           username: ubuntu
           key: ${{ needs.terraform.outputs.ec2_key }}
           script: |
-            until command -v docker >/dev/null 2>&1; do
-              echo "Waiting for Docker to be installed..."
-              sleep 30
+            # Wait until Docker daemon is ready
+            until sudo docker info >/dev/null 2>&1; do
+                echo "Waiting for Docker daemon to start..."
+                sleep 20
             done
+
+            # Pull latest Docker image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/my-website:latest
+
+            # Stop and remove old container if exists
             sudo docker stop website || true
             sudo docker rm website || true
+
+            # Run new container
             sudo docker run -d --name website -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-website:latest
