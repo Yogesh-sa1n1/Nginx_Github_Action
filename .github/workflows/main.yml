@@ -63,6 +63,9 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/my-website:latest
 
+      - name: Wait for EC2 to be ready
+        run: sleep 20
+
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -70,9 +73,9 @@ jobs:
           username: ubuntu
           key: ${{ needs.terraform.outputs.ec2_key }}
           script: |
-            until command -v docker; do
-                echo "Waiting for Docker installation..."
-                sleep 30
+            until command -v docker >/dev/null 2>&1; do
+              echo "Waiting for Docker to be installed..."
+              sleep 30
             done
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/my-website:latest
             sudo docker stop website || true
